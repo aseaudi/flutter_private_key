@@ -17,7 +17,7 @@ import 'package:path_provider/path_provider.dart';
 
 final GoogleSignIn _googleSignIn = GoogleSignIn(
     // Optional clientId
-    // clientId: '258477920845-trq70918u2a5cngo317aro0n6gg9813j.apps.googleusercontent.com',
+    // clientId: 'xxxxxxx.apps.googleusercontent.com',
     // scopes: <String>[PeopleServiceApi.contactsReadonlyScope],
     scopes: <String>[
       // 'https://www.googleapis.com/auth/drive',
@@ -101,7 +101,7 @@ class _KeyGeneratorPageState extends State<KeyGeneratorPage> {
   final _storage = const FlutterSecureStorage();
   GoogleSignInAccount? _currentUser;
   final storage = FlutterSecureStorage();
-  late ga.FileList list;
+  // late ga.FileList gdlist;
 
   @override
   void initState() {
@@ -200,15 +200,16 @@ class _KeyGeneratorPageState extends State<KeyGeneratorPage> {
     print("XXXXXX proceed to restore key from google drive");
     var client = GoogleHttpClient(await _currentUser!.authHeaders);
     var drive = ga.DriveApi(client);
-    drive.files.list(spaces: 'appDataFolder').then((value) {
-      setState(() {
-        list = value;
-      });
-    });
-    var fl = list.files!.length - 1;
-    var fName = list.files![fl].name;
-    var gdID = list.files![fl].id;
-    print("XXXXXX Id: ${list.files![fl].id} File Name:${list.files![fl].name}");
+    final gdlist = await drive.files.list(spaces: 'appDataFolder');
+    // .then((value) {
+    //   setState(() {
+    //     gdlist = value;
+    //   });
+    // });
+    var fl = gdlist.files!.length - 1;
+    var fName = gdlist.files![fl].name;
+    var gdID = gdlist.files![fl].id;
+    print("XXXXXX Id: ${gdlist.files![fl].id} File Name:${gdlist.files![fl].name}");
     //   _downloadGoogleDriveFile(list.files![i].name, list.files![i].id);
     ga.Media file = await drive.files
         .get(gdID!, downloadOptions: ga.DownloadOptions.fullMedia) as ga.Media;
@@ -426,7 +427,7 @@ ${base64.encode(public_key_obj.toString().codeUnits)}
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _listGoogleDriveFiles,
-              child: const Text('Retrieve Private Key from Google Drive'),
+              child: const Text('Restore Private Key from Google Drive'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
